@@ -67,7 +67,7 @@ Policy-driven automatic response. When a critical attack pattern is detected —
 ## Attack Patterns Detected
 
 | Pattern | Framework | Description |
-|---------|-----------|-------------|
+|------|-----------|-------------|
 | Credential Exfiltration | OWASP ASI-03 | Agent reads credentials then sends to external endpoint |
 | Memory Poisoning | OWASP ASI-05 | External content modifies agent identity files (SOUL.md) |
 | Supply Chain Attack | OWASP ASI-07 | Marketplace skill executes privileged operations |
