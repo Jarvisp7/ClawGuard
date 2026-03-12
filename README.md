@@ -1,135 +1,191 @@
-# ◈ ClawGuard
+<p align="center">
+  <h1 align="center">◈ ClawGuard</h1>
+  <p align="center"><strong>Runtime Observability & Threat Detection for AI Agents</strong></p>
+  <p align="center">
+    <em>Your AI agent's decisions should be as visible as your server's logs.</em>
+  </p>
+</p>
 
-**Runtime Observability & Threat Detection for AI Agents**
-
-ClawGuard is an open-source monitoring layer that captures *what your AI agent actually does*, detects when it's been compromised, and gives security teams full trace replay of every decision chain.
-
-> Traditional security tools can tell you *an agent exists* in your environment.  
-> ClawGuard tells you *what it's doing and whether that's safe.*
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.1.0--alpha-blue" alt="Version">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+  <img src="https://img.shields.io/badge/platform-macOS-lightgrey" alt="Platform">
+  <img src="https://img.shields.io/badge/agent-OpenClaw-orange" alt="OpenClaw">
+</p>
 
 ---
 
 ## The Problem
 
-Autonomous AI agents like OpenClaw operate with broad system access — reading emails, executing shell commands, managing credentials, and calling external APIs. When these agents are compromised through prompt injection, malicious skills, or misconfiguration:
+Autonomous AI agents like OpenClaw operate with broad system access — reading emails, executing shell commands, managing credentials, and calling external APIs. **When these agents are compromised, existing security tools are blind:**
 
 - **Network monitoring** sees HTTP 200. It can't distinguish legitimate email from data exfiltration.
 - **EDR** sees process execution. It can't interpret agent reasoning or detect semantic manipulation.
 - **IAM** sees OAuth grants. It doesn't flag when an agent acts beyond user intent.
 
-**The result:** Agent-driven incidents are invisible to existing security stacks.
+**ClawGuard fills this gap.** It captures what your AI agent actually does, detects when it's been compromised, and gives you full control — from passive monitoring to automatic threat neutralization.
 
-## How ClawGuard Works
+---
+
+## How It Works
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌────────────────┐
-│   OpenClaw   │────▶│  ClawGuard   │────▶│   Dashboard    │
-│    Agent     │     │  Collector   │     │  (SaaS / Self) │
-│              │     │              │     │                │
-│  LLM Calls   │     │ Event Stream │     │ Live Feed      │
-│  Tool Calls  │     │ Risk Scoring │     │ Trace Replay   │
-│  File Access │     │ Trace Assembly│    │ Alert Engine   │
-│  Net Calls   │     │ Policy Check │     │ Fleet Overview │
+│   AI Agent   │────▶│  ClawGuard   │────▶│   Desktop App  │
+│  (OpenClaw)  │     │    Hook      │     │                │
+│              │     │              │     │  Live Feed     │
+│  LLM Calls   │     │ Event Capture│     │  Risk Scoring  │
+│  Tool Calls  │     │ Risk Scoring │     │  Threat Alerts │
+│  File Access │     │ Pattern Det. │     │  Kill Switch   │
+│  Net Calls   │     │ NDJSON Log   │     │  Auto-Protect  │
 └─────────────┘     └──────────────┘     └────────────────┘
 ```
 
-### Three Layers
+ClawGuard operates as a **three-layer system**:
 
-1. **Agent Collector** (Open Source) — Lightweight proxy/plugin that intercepts all agent-tool interactions. Captures LLM calls, tool invocations, file access, credential use, and network requests. <50MB memory footprint.
+1. **Agent Hook** — Installs into the OpenClaw gateway and passively captures all agent activity: LLM calls, tool invocations, file access, credential use, network requests, skill loads, and memory operations. Zero performance impact.
 
-2. **Trace Engine** — Assembles raw events into semantic *decision traces* — causal chains showing the agent's path from input to action. Detects known attack patterns (OWASP ASI, MITRE ATLAS mapped).
+2. **Threat Engine** — Scores every event for risk (0-5), assembles events into causal decision traces, and detects known attack patterns mapped to OWASP ASI and MITRE ATLAS frameworks.
 
-3. **Policy Engine** — Configurable security rules with sequence detection, threshold alerts, and pattern matching. Ships with defaults covering credential exfiltration, memory poisoning, supply chain attacks, and prompt injection.
+3. **Desktop App** — Native Mac application showing real-time event streams, color-coded risk levels, and three protection modes.
 
-## Quick Start
+---
 
-```bash
-npm install clawguard
-```
+## Three Protection Modes
 
-```typescript
-import { EventCollector, TraceEngine, PolicyEngine } from 'clawguard';
+### 👁 Monitor
+Passive observation. ClawGuard watches and logs everything without intervening. Use this to learn what "normal" looks like for your agent before enabling protection.
 
-// Initialize
-const collector = new EventCollector({
-  agentId: 'my-openclaw-agent',
-  output: { stdout: true, file: { path: './clawguard.ndjson', maxSizeMb: 100, rotateCount: 5 } },
-  policies: [],
-  sensitivePatterns: [],
-  captureTypes: [],
-  bufferSize: 100,
-  captureLlmContent: false,
-  captureToolArgs: true,
-});
+### 🔔 Alert + Kill
+Real-time threat alerts with a manual kill switch. When ClawGuard detects suspicious activity, you see it immediately and decide whether to stop the agent. The default for most users.
 
-const traces = new TraceEngine({
-  onAlert: (trace, patterns) => {
-    console.error(`🚨 ALERT: ${trace.id} — ${patterns[0].name}`);
-    console.error(`   ${patterns[0].description}`);
-    console.error(`   Confidence: ${patterns[0].confidence}`);
-  }
-});
+### 🛡 Auto-Protect
+Policy-driven automatic response. When a critical attack pattern is detected — credential exfiltration, memory poisoning, supply chain attacks — ClawGuard stops the agent automatically before damage is done. No human in the loop required.
 
-const policies = new PolicyEngine();
-
-// Wire together
-collector.onEvent((event) => {
-  traces.processEvent(event);
-  const violations = policies.evaluate(event);
-  violations.forEach(v => {
-    console.error(`⚠ Policy violation: ${v.policyName} — ${v.description}`);
-  });
-});
-
-// Start monitoring
-collector.start();
-```
+---
 
 ## Attack Patterns Detected
 
-| Pattern | OWASP ASI | MITRE ATLAS | Description |
-|---------|-----------|-------------|-------------|
-| Read-Then-Exfiltrate | ASI-03 | AML.T0048 | Agent reads credentials/sensitive data then sends to external endpoint |
-| Memory Poisoning | ASI-05 | AML.T0051 | External content modifies agent identity files (SOUL.md, MEMORY.md) |
-| Supply Chain Skill | ASI-07 | AML.T0042 | Marketplace skill executes privileged operations after install |
-| Prompt Injection | ASI-01 | — | External content triggers unexpected privileged agent actions |
-| Lateral Movement | ASI-04 | — | Agent uses OAuth tokens to access services beyond original scope |
+| Pattern | Framework | Description |
+|---------|-----------|-------------|
+| Credential Exfiltration | OWASP ASI-03 | Agent reads credentials then sends to external endpoint |
+| Memory Poisoning | OWASP ASI-05 | External content modifies agent identity files (SOUL.md) |
+| Supply Chain Attack | OWASP ASI-07 | Marketplace skill executes privileged operations |
+| Prompt Injection | OWASP ASI-01 | External content triggers unexpected agent actions |
+| Lateral Movement | OWASP ASI-04 | Agent uses OAuth tokens beyond original scope |
 
-## Default Policies
+---
 
-ClawGuard ships with 7 default policies covering the most critical OpenClaw attack vectors:
+## Quick Start
+
+### Prerequisites
+- Node.js ≥ 18
+- OpenClaw installed (`npm install -g openclaw@latest`)
+- Rust (for desktop app)
+
+### Install the Hook
+
+```bash
+# Create the hook directory
+mkdir -p ~/.openclaw/hooks/clawguard
+
+# Copy hook files (HOOK.md and handler.ts)
+# See /hooks directory in this repo
+
+# Enable it
+openclaw hooks enable clawguard
+
+# Restart your gateway
+openclaw gateway --allow-unconfigured
+```
+
+### Run the Desktop App
+
+```bash
+cd desktop-app
+npm install
+npm run tauri dev
+```
+
+The app reads from `~/.openclaw/clawguard-events.ndjson` and displays events in real time.
+
+---
+
+## Project Structure
+
+```
+clawguard/
+├── src/
+│   ├── types/          # Event schema & type definitions
+│   ├── collector/      # Event capture & risk scoring engine
+│   ├── trace/          # Decision chain assembly & attack detection
+│   ├── policy/         # Configurable security rules (7 defaults)
+│   └── plugin/         # OpenClaw gateway plugin
+├── desktop-app/        # Tauri native Mac application
+│   ├── index.html      # Dashboard UI
+│   └── src-tauri/      # Rust backend (event reader, kill switch, auto-protect)
+├── config/             # Default configuration
+└── README.md
+```
+
+---
+
+## Default Security Policies
+
+ClawGuard ships with 7 policies covering the most critical agent attack vectors:
 
 - **POL-001** Credential Exfiltration — credential access → external network call
-- **POL-002** Identity File Tampering — any SOUL.md / identity modification (auto-block)
+- **POL-002** Identity File Tampering — SOUL.md / identity modification (auto-block)
 - **POL-003** Rapid Credential Access — >3 credential reads in 60 seconds
-- **POL-004** Marketplace Skill Shell Execution — ClawHub skill → shell command
+- **POL-004** Marketplace Skill Shell Exec — ClawHub skill → shell command
 - **POL-005** Sensitive Data to External — sensitive data in outbound traffic
 - **POL-006** High Volume Tool Calls — >50 tool calls in 5 minutes (runaway agent)
-- **POL-007** Memory Modification After External Content — data read → memory write
+- **POL-007** Memory Modification — data read → memory write chain
+
+---
 
 ## Roadmap
 
-- [x] Event schema & type system
-- [x] Event collector with risk scoring
-- [x] Trace engine with attack pattern detection
+- [x] Core event schema & type system
+- [x] Event collector with real-time risk scoring
+- [x] Trace engine with attack pattern detection (OWASP/MITRE mapped)
 - [x] Policy engine with configurable rules
-- [ ] OpenClaw gateway plugin (direct integration)
-- [ ] Terminal UI for local trace viewing
-- [ ] Web dashboard (SaaS)
-- [ ] Multi-agent fleet management
+- [x] OpenClaw gateway hook (live event capture)
+- [x] Native Mac desktop app
+- [x] Three protection modes (Monitor / Alert+Kill / Auto-Protect)
+- [x] Kill switch (manual + automatic)
 - [ ] Behavioral baseline learning
-- [ ] SIEM/SOAR integrations (Splunk, Sentinel, etc.)
+- [ ] Threat replay (step through attack chains)
+- [ ] Agent diff (compare behavior against baseline)
+- [ ] Multi-agent fleet management
+- [ ] Connectors for Claude Code, CrewAI, AutoGPT, LangGraph
+- [ ] Windows & Linux desktop apps
+- [ ] Web dashboard (SaaS)
+- [ ] SIEM/SOAR integrations (Splunk, Sentinel, PagerDuty)
 - [ ] Compliance reporting (SOC 2, HIPAA)
+
+---
+
+## Why ClawGuard Exists
+
+In January 2026, OpenClaw went viral — 300K+ GitHub stars, 1.5M+ registered agents. Within weeks, security researchers found 135,000+ exposed instances, 12% of the skill marketplace compromised with malware, and critical RCE vulnerabilities being exploited in the wild. CrowdStrike called it "groundbreaking" from a capability perspective and "an absolute nightmare" from a security perspective.
+
+Every existing security tool can tell you *an agent exists* in your environment. None of them can tell you *what the agent is doing, why it made a decision, or whether that decision chain was manipulated*.
+
+ClawGuard closes that gap.
+
+---
 
 ## Contributing
 
-ClawGuard is in early alpha. We welcome contributions:
+ClawGuard is in early alpha. Contributions welcome:
 
 1. Fork the repo
 2. Create a feature branch (`git checkout -b feature/amazing-detection`)
-3. Commit your changes (`git commit -m 'Add amazing detection'`)
-4. Push to the branch (`git push origin feature/amazing-detection`)
-5. Open a Pull Request
+3. Commit your changes
+4. Push and open a Pull Request
+
+---
 
 ## License
 
@@ -137,4 +193,6 @@ MIT — use it, fork it, build on it.
 
 ---
 
-**ClawGuard** — Because your agent's decisions should be as visible as your server's logs.
+<p align="center">
+  Built by <a href="https://github.com/Jarvisp7">Jarvis Perdue</a>
+</p>
