@@ -1,0 +1,19 @@
+{
+  "$schema": "./config.schema.json",
+  "agentId": "my-openclaw-agent",
+  "output": {
+    "file": {
+      "path": "./clawguard-events.ndjson",
+      "maxSizeMb": 100,
+      "rotateCount": 5
+    },
+    "stdout": true,
+    "remote": null
+  },
+  "policies": "default",
+  "sensitivePatterns": [],
+  "captureTypes": [],
+  "bufferSize": 100,
+  "captureLlmContent": false,
+  "captureToolArgs": true
+}

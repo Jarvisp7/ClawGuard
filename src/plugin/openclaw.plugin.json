@@ -1,0 +1,1 @@
+{"id":"clawguard","name":"ClawGuard","version":"0.1.0","description":"Runtime observability for AI agents","license":"MIT","keywords":["openclaw","openclaw-plugin","security"],"configSchema":{"type":"object","properties":{"outputPath":{"type":"string"},"verbose":{"type":"boolean"}}}}
