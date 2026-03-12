@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/agent-OpenClaw-orange" alt="OpenClaw">
 </p>
 ![ClawGuard Dashboard](assets/clawguard-dashboard.png)
+
 ---
 
 ## The Problem
