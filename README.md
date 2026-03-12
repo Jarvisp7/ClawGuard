@@ -177,6 +177,9 @@ ClawGuard closes that gap.
 
 ---
 
+**Note:** ClawGuard is in active development (v0.1.0-alpha). The Live Feed and protection modes are fully functional. Analytics, Playbooks, Agents, Traces, and Settings views are on the roadmap and coming soon. Star the repo to follow progress.
+
+
 ## Contributing
 
 ClawGuard is in early alpha. Contributions welcome:
