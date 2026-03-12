@@ -54,13 +54,13 @@ ClawGuard operates as a **three-layer system**:
 
 ## Three Protection Modes
 
-### 👁 Monitor
+###  Monitor
 Passive observation. ClawGuard watches and logs everything without intervening. Use this to learn what "normal" looks like for your agent before enabling protection.
 
-### 🔔 Alert + Kill
+###  Alert + Kill
 Real-time threat alerts with a manual kill switch. When ClawGuard detects suspicious activity, you see it immediately and decide whether to stop the agent. The default for most users.
 
-### 🛡 Auto-Protect
+###  Auto-Protect
 Policy-driven automatic response. When a critical attack pattern is detected — credential exfiltration, memory poisoning, supply chain attacks — ClawGuard stops the agent automatically before damage is done. No human in the loop required.
 
 ---
