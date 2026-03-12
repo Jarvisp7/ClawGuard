@@ -4,163 +4,252 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ClawGuard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg-0:#060608;--bg-1:#0a0a0e;--bg-2:#0f0f14;--bg-3:#15151c;--bg-4:#1b1b24;--bg-5:#222230;
+  --surface:#0c0c11;--surface-up:#101016;--surface-top:#14141b;
+  --border:rgba(255,255,255,0.045);--border-mid:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.1);
+  --text-0:#f2f2f5;--text-05:#d4d4da;--text-1:#9898a4;--text-2:#636370;--text-3:#404050;--text-4:#2a2a36;
+  --blue:#5794F7;--blue-dim:rgba(87,148,247,0.1);--blue-glow:rgba(87,148,247,0.05);--blue-line:rgba(87,148,247,0.25);
+  --green:#3DDC84;--green-dim:rgba(61,220,132,0.1);--green-glow:rgba(61,220,132,0.04);
+  --amber:#EDAA4A;--amber-dim:rgba(237,170,74,0.1);--amber-glow:rgba(237,170,74,0.04);
+  --red:#E5484D;--red-dim:rgba(229,72,77,0.1);--red-glow:rgba(229,72,77,0.04);--red-line:rgba(229,72,77,0.25);
+  --purple:#A78BFA;--purple-dim:rgba(167,139,250,0.1);
+  --font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:8px;--r-sm:6px;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Menlo','Monaco','Courier New',monospace;background:#0a0a0f;color:#e0e0e0;font-size:13px;overflow:hidden;height:100vh}
-#header{background:linear-gradient(90deg,#0a0a0f,#111128,#0a0a0f);border-bottom:1px solid #1a1a3e;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-#logo{font-size:20px;font-weight:700;background:linear-gradient(135deg,#2dd4bf,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#version{color:#555;font-size:11px;margin-left:8px}
-#stats{display:flex;gap:1px;background:#111;border-bottom:1px solid #1a1a3e}
-.stat{flex:1;padding:10px 16px;background:#0d0d15}
-.stat-label{font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:4px}
-.stat-value{font-size:22px;font-weight:700}
-#feed{flex:1;overflow-y:auto;padding:16px}
-.event{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;margin-bottom:2px;border-radius:2px;cursor:default;transition:background 0.15s}
-.event:hover{background:rgba(255,255,255,0.04)}
-.event-icon{font-size:16px;width:24px;text-align:center}
-.event-ts{color:#555;min-width:75px;font-size:11px;margin-top:2px}
-.event-type{color:#818cf8;min-width:90px;font-size:11px;margin-top:2px}
-.event-detail{flex:1;font-size:12px}
-.risk-badge{font-size:10px;padding:2px 6px;border-radius:3px;min-width:20px;text-align:center}
-.r0{border-left:3px solid #2dd4bf;background:rgba(45,212,191,0.05)}.r0 .risk-badge{background:rgba(45,212,191,0.15);color:#2dd4bf;border:1px solid rgba(45,212,191,0.3)}
-.r1{border-left:3px solid #a3e635;background:rgba(163,230,53,0.05)}.r1 .risk-badge{background:rgba(163,230,53,0.15);color:#a3e635;border:1px solid rgba(163,230,53,0.3)}
-.r2{border-left:3px solid #fbbf24;background:rgba(251,191,36,0.05)}.r2 .risk-badge{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
-.r3{border-left:3px solid #fb923c;background:rgba(251,146,60,0.05)}.r3 .risk-badge{background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)}
-.r4{border-left:3px solid #f87171;background:rgba(248,113,113,0.08)}.r4 .risk-badge{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)}
-.r5{border-left:3px solid #ef4444;background:rgba(239,68,68,0.1)}.r5 .risk-badge{background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4)}
-.r5 .event-detail{color:#f87171}
-#empty{text-align:center;color:#333;margin-top:80px;font-size:14px}
-#controls{padding:8px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a1a3e}
-#controls span{color:#555;font-size:11px;letter-spacing:1px}
-button{padding:5px 14px;border:1px solid #2dd4bf;border-radius:4px;background:transparent;color:#2dd4bf;cursor:pointer;font-size:11px;font-family:inherit}
-button:hover{background:rgba(45,212,191,0.1)}
-.alert-banner{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:4px;padding:10px 16px;margin:8px 16px;font-size:12px;color:#f87171;display:none}
-.alert-banner.show{display:block}
-#app{display:flex;flex-direction:column;height:100vh}
-#mode-bar{display:flex;gap:1px;border-bottom:1px solid #1a1a3e}
-.mode-btn{flex:1;padding:10px;text-align:center;background:#0d0d15;cursor:pointer;font-size:11px;letter-spacing:1px;color:#555;border:none;font-family:inherit;transition:all 0.2s}
-.mode-btn:hover{background:#111128}
-.mode-btn.active{color:#2dd4bf;border-bottom:2px solid #2dd4bf;background:#0d0d20}
-.mode-btn.active-warn{color:#fbbf24;border-bottom:2px solid #fbbf24;background:#1a1508}
-.mode-btn.active-danger{color:#ef4444;border-bottom:2px solid #ef4444;background:#1a0808}
-.protect-status{padding:6px 16px;font-size:11px;border-bottom:1px solid #1a1a3e;display:flex;align-items:center;gap:8px}
-.protect-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-.pulse{animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.killed-banner{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5);border-radius:4px;padding:12px 16px;margin:8px 16px;font-size:13px;color:#ef4444;display:none;text-align:center}
-.killed-banner.show{display:block}
+body{font-family:var(--font);background:var(--bg-0);color:var(--text-1);font-size:13px;overflow:hidden;height:100vh;-webkit-font-smoothing:antialiased}
+::selection{background:var(--blue-dim);color:var(--text-0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--text-4);border-radius:10px}
+
+#app{display:grid;grid-template-columns:216px 1fr 296px;grid-template-rows:44px 1fr;height:100vh}
+
+/* ═══ TOPBAR ═══ */
+#topbar{grid-column:1/-1;display:flex;align-items:center;padding:0 12px;background:var(--bg-1);border-bottom:1px solid var(--border);z-index:10;gap:10px}
+.tb-l{display:flex;align-items:center;gap:9px;min-width:194px}
+.tb-logo{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--text-0);letter-spacing:-0.5px;display:flex;align-items:center;gap:7px}
+.tb-mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(140deg,#4A7CF7,#7C5CFC);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(74,124,247,0.2),inset 0 1px 0 rgba(255,255,255,0.1)}
+.tb-mark svg{width:12px;height:12px}
+.tb-env{font-size:9.5px;font-family:var(--mono);color:var(--text-3);background:var(--bg-3);padding:2px 7px;border-radius:4px;letter-spacing:0.4px;border:1px solid var(--border)}
+.tb-mid{flex:1;max-width:440px;margin:0 auto}
+.tb-search{width:100%;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px 6px 30px;color:var(--text-1);font-size:11.5px;font-family:var(--font);outline:none;transition:all 0.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23404050' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}
+.tb-search:focus{border-color:var(--blue-line);background:var(--bg-1);box-shadow:0 0 0 3px var(--blue-glow)}
+.tb-search::placeholder{color:var(--text-4)}
+.tb-r{display:flex;align-items:center;gap:6px;min-width:194px;justify-content:flex-end}
+.tb-pill{display:flex;align-items:center;gap:5px;font-size:10.5px;font-family:var(--mono);padding:0 10px;color:var(--text-2)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-g{background:var(--green);box-shadow:0 0 6px var(--green),0 0 2px var(--green)}
+.dot-r{background:var(--red);box-shadow:0 0 6px var(--red),0 0 2px var(--red)}
+.dot-b{animation:dP 2.8s ease-in-out infinite}
+@keyframes dP{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+.btn{padding:5px 10px;border-radius:var(--r-sm);font-size:10px;font-family:var(--mono);font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-2);transition:all 0.12s;display:flex;align-items:center;gap:4px;letter-spacing:0.3px}
+.btn:hover{border-color:var(--border-hi);color:var(--text-1);background:var(--surface-up)}
+.btn:active{transform:scale(0.97)}
+.btn-kill{border-color:rgba(229,72,77,0.15);color:var(--red)}
+.btn-kill:hover{background:var(--red-dim);border-color:var(--red-line)}
+
+/* ═══ SIDEBAR ═══ */
+#sidebar{grid-row:2;background:var(--bg-1);border-right:1px solid var(--border);padding:10px 0;overflow-y:auto;display:flex;flex-direction:column}
+.sb-g{padding:0 8px;margin-bottom:16px}
+.sb-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.6px;color:var(--text-4);padding:0 10px;margin-bottom:6px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;transition:all 0.1s;color:var(--text-2);font-size:12.5px;position:relative}
+.sb-i:hover{background:rgba(255,255,255,0.025);color:var(--text-1)}
+.sb-i.on{background:var(--blue-glow);color:var(--text-0);font-weight:500}
+.sb-i.on::before{content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:2px;height:16px;background:var(--blue);border-radius:2px;box-shadow:0 0 6px var(--blue-glow)}
+.sb-ic{width:15px;height:15px;opacity:0.35;flex-shrink:0}
+.sb-i:hover .sb-ic{opacity:0.55}
+.sb-i.on .sb-ic{opacity:0.85}
+.sb-b{margin-left:auto;font-size:9px;font-family:var(--mono);font-weight:600;padding:1px 5px;border-radius:8px}
+.sb-b-r{background:var(--red-dim);color:var(--red)}.sb-b-b{background:var(--blue-dim);color:var(--blue)}
+.sb-sp{flex:1}
+.sb-div{height:1px;background:var(--border);margin:6px 16px}
+.sb-seg{margin:0 8px;padding:2px;background:var(--bg-0);border:1px solid var(--border);border-radius:var(--r);display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
+.sb-seg-b{padding:7px 2px;text-align:center;font-size:9px;font-weight:600;letter-spacing:0.7px;text-transform:uppercase;border-radius:var(--r-sm);cursor:pointer;transition:all 0.15s;border:none;font-family:var(--mono);color:var(--text-4);background:transparent}
+.sb-seg-b:hover{color:var(--text-2)}
+.sb-seg-b:active{transform:scale(0.96)}
+.sb-seg-b.on{background:var(--surface-top);color:var(--text-0);box-shadow:0 1px 6px rgba(0,0,0,0.5),0 0 0 1px var(--border-mid)}
+.sb-seg-b.on-r{background:var(--red-dim);color:var(--red);box-shadow:0 0 10px var(--red-glow),0 0 0 1px var(--red-line)}
+
+/* ═══ STATS ═══ */
+#main{grid-row:2;background:var(--bg-0);overflow-y:auto;display:flex;flex-direction:column}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:12px 14px;background:linear-gradient(180deg,var(--bg-1) 0%,var(--bg-0) 100%);border-bottom:1px solid var(--border)}
+.sc{padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;transition:border 0.2s,box-shadow 0.2s}
+.sc:hover{border-color:var(--border-mid);box-shadow:0 2px 12px rgba(0,0,0,0.25)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
+.sc-b::before{background:linear-gradient(90deg,transparent 10%,var(--blue-dim) 50%,transparent 90%)}
+.sc-r::before{background:linear-gradient(90deg,transparent 10%,var(--red-dim) 50%,transparent 90%)}
+.sc-a::before{background:linear-gradient(90deg,transparent 10%,var(--amber-dim) 50%,transparent 90%)}
+.sc-p::before{background:linear-gradient(90deg,transparent 10%,var(--purple-dim) 50%,transparent 90%)}
+.sc-label{font-size:9.5px;font-weight:500;text-transform:uppercase;letter-spacing:1.3px;color:var(--text-2);font-family:var(--mono);margin-bottom:10px}
+.sc-val{font-size:34px;font-weight:700;font-family:var(--mono);color:var(--text-0);line-height:1;letter-spacing:-2px}
+.sc-sub{font-size:10px;color:var(--text-4);margin-top:8px;font-family:var(--mono)}
+
+/* ═══ ALERTS ═══ */
+.al{padding:7px 14px;display:none;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.al.show{display:flex}
+.al-c{background:var(--red-glow);border-left:2px solid var(--red)}
+.al-c .al-t{color:var(--red);font-family:var(--mono);font-size:10.5px;font-weight:500}
+.al-p{background:rgba(229,72,77,0.04);border-left:2px solid var(--red)}
+.al-p .al-t{color:var(--red);font-family:var(--mono);font-size:10.5px;font-weight:600}
+
+/* ═══ FEED ═══ */
+.fh{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:var(--bg-1)}
+.fh-t{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--text-4);font-family:var(--mono)}
+.fh-c{font-size:9.5px;color:var(--text-4);font-family:var(--mono)}
+.fd{flex:1;overflow-y:auto}
+
+/* ═══ EVENTS ═══ */
+.ev{display:grid;grid-template-columns:30px 66px 1fr 24px;align-items:start;gap:6px;padding:9px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
+.ev:hover{background:rgba(255,255,255,0.018)}
+.ei{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center}
+.ei-s{background:var(--bg-4);color:var(--text-3)}.ei-w{background:var(--amber-dim);color:var(--amber)}.ei-c{background:var(--red-dim);color:var(--red)}
+.et{font-size:10px;font-family:var(--mono);color:var(--text-4);padding-top:4px}
+.en{font-size:11px;font-family:var(--mono);font-weight:500;margin-bottom:2px}
+.en-s{color:var(--text-1)}.en-w{color:var(--amber)}.en-c{color:var(--red)}
+.ed{font-size:11.5px;color:var(--text-2);line-height:1.45}
+.er{width:22px;height:22px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-family:var(--mono);font-weight:700}
+.er0{background:var(--bg-4);color:var(--text-4)}.er1{background:var(--bg-4);color:var(--text-3)}
+.er2{background:var(--amber-dim);color:var(--amber)}.er3{background:var(--amber-dim);color:var(--amber)}
+.er4{background:var(--red-dim);color:var(--red)}.er5{background:var(--red-dim);color:var(--red);box-shadow:0 0 8px var(--red-glow)}
+
+/* ═══ EMPTY ═══ */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;position:relative}
+.empty-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.empty-bg::before{content:'';position:absolute;width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--blue-glow) 0%,transparent 70%);animation:bgP 6s ease-in-out infinite}
+.empty-bg::after{content:'';position:absolute;width:160px;height:160px;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid var(--border);opacity:0.4}
+@keyframes bgP{0%,100%{opacity:0.25;transform:translate(-50%,-50%) scale(0.95)}50%{opacity:0.5;transform:translate(-50%,-50%) scale(1.05)}}
+.empty-core{position:relative;width:72px;height:72px;margin-bottom:24px}
+.empty-ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--border)}
+.empty-spin{position:absolute;inset:-2px;border-radius:50%;border:1.5px solid transparent;border-top-color:var(--blue);animation:spin 5s linear infinite;opacity:0.5}
+.empty-r2{position:absolute;inset:12px;border-radius:50%;border:1px solid var(--border);opacity:0.4}
+.empty-s2{position:absolute;inset:10px;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(87,148,247,0.25);animation:spin 8s linear infinite reverse}
+.empty-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue),0 0 4px var(--blue);animation:cP 3s ease-in-out infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes cP{0%,100%{opacity:0.45;transform:translate(-50%,-50%) scale(0.85)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+.empty-t{font-size:14px;font-weight:500;color:var(--text-05);margin-bottom:6px;letter-spacing:-0.2px}
+.empty-s{font-size:12px;color:var(--text-2);text-align:center;line-height:1.7}
+
+/* ═══ DETAIL ═══ */
+#detail{grid-row:2;background:var(--bg-1);border-left:1px solid var(--border);overflow-y:auto}
+.dh{padding:16px 16px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--surface-up) 0%,var(--bg-1) 100%);position:relative}
+.dh::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue-dim),transparent)}
+.dh-n{font-size:14px;font-weight:600;color:var(--text-0);letter-spacing:-0.3px;margin-bottom:4px}
+.dh-s{font-size:10.5px;color:var(--text-2);font-family:var(--mono)}
+.ds{padding:14px 16px;border-bottom:1px solid var(--border)}
+.ds-t{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.6px;color:var(--text-4);margin-bottom:10px;font-family:var(--mono)}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.dr-l{font-size:11.5px;color:var(--text-2)}.dr-v{font-size:11.5px;font-family:var(--mono);color:var(--text-05);font-weight:500}
+.dp{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:0.3px}
+.dp-g{background:var(--green-dim);color:var(--green);border:1px solid rgba(61,220,132,0.12)}
+.dp-r{background:var(--red-dim);color:var(--red);border:1px solid rgba(229,72,77,0.12)}
+
+.dtl-i{display:flex;gap:10px;padding-bottom:12px}
+.dtl-i:last-child{padding-bottom:0}
+.dtl-tr{display:flex;flex-direction:column;align-items:center;width:12px;flex-shrink:0}
+.dtl-d{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.dtl-ln{width:1px;flex:1;margin-top:4px}
+.dtl-d0{background:var(--text-4)}.dtl-d3{background:var(--amber);box-shadow:0 0 4px var(--amber-glow)}.dtl-d5{background:var(--red);box-shadow:0 0 6px var(--red-glow)}
+.dtl-ln0{background:var(--bg-5)}.dtl-ln3{background:rgba(237,170,74,0.1)}.dtl-ln5{background:rgba(229,72,77,0.1)}
+.dtl-b{flex:1;min-width:0}
+.dtl-n{font-size:10.5px;font-family:var(--mono);font-weight:500}
+.dtl-dt{font-size:10.5px;color:var(--text-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtl-ts{font-size:9px;color:var(--text-4);font-family:var(--mono);margin-top:2px}
+
+.da{padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.da-b{width:100%;padding:7px 12px;border-radius:var(--r-sm);font-size:11px;font-family:var(--mono);font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-2);transition:all 0.12s;text-align:left;display:flex;align-items:center;gap:7px}
+.da-b:hover{border-color:var(--border-hi);background:var(--surface-up);color:var(--text-1)}
+.da-b:active{transform:scale(0.98)}
+.da-k{border-color:rgba(229,72,77,0.1);color:var(--red);margin-top:10px}
+.da-k:hover{background:var(--red-dim);border-color:var(--red-line)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.ev{animation:fadeIn 0.15s ease}
 </style>
 </head>
 <body>
 <div id="app">
-<div id="header">
-<div style="display:flex;align-items:center;gap:12px"><span id="logo">◈ CLAWGUARD</span><span id="version">v0.1.0-alpha</span></div>
-<div style="display:flex;gap:8px">
-<button onclick="loadEvents()">↻ Refresh</button>
-<button id="killBtn" style="border-color:#ef4444;color:#ef4444" onclick="killSwitch()">⚡ Kill Switch</button>
-</div>
-</div>
-<div id="mode-bar">
-<button class="mode-btn active" id="mode-monitor" onclick="setMode('monitor')">👁 MONITOR</button>
-<button class="mode-btn" id="mode-alert" onclick="setMode('alert')">🔔 ALERT + KILL</button>
-<button class="mode-btn" id="mode-protect" onclick="setMode('protect')">🛡 AUTO-PROTECT</button>
-</div>
-<div class="protect-status" id="protectStatus">
-<span class="protect-dot" id="protectDot" style="background:#555"></span>
-<span id="protectLabel" style="color:#555">Monitor mode — logging only</span>
-</div>
-<div id="stats">
-<div class="stat"><div class="stat-label">EVENTS</div><div class="stat-value" id="s-events" style="color:#818cf8">0</div></div>
-<div class="stat"><div class="stat-label">CRITICAL</div><div class="stat-value" id="s-critical" style="color:#2dd4bf">0</div></div>
-<div class="stat"><div class="stat-label">WARNINGS</div><div class="stat-value" id="s-warnings" style="color:#2dd4bf">0</div></div>
-<div class="stat"><div class="stat-label">AVG RISK</div><div class="stat-value" id="s-avgrisk" style="color:#818cf8">0.00</div></div>
-<div class="stat"><div class="stat-label">STATUS</div><div class="stat-value" id="s-status" style="color:#2dd4bf">●</div></div>
-</div>
-<div class="alert-banner" id="alertBanner">🚨 THREAT DETECTED</div>
-<div class="killed-banner" id="killedBanner">⚡ AUTO-PROTECT: Agent has been automatically stopped</div>
-<div id="controls"><span>LIVE EVENT STREAM</span><span id="eventCount">0 events</span></div>
-<div id="feed"><div id="empty">◈ Waiting for agent events...<br><br>Start the OpenClaw gateway to see live activity.</div></div>
+  <div id="topbar">
+    <div class="tb-l"><div class="tb-logo"><div class="tb-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/></svg></div>ClawGuard</div><div class="tb-env">local</div></div>
+    <div class="tb-mid"><input class="tb-search" type="text" placeholder="Search events, agents, or ask a question..."/></div>
+    <div class="tb-r">
+      <div class="tb-pill"><div class="dot dot-g dot-b" id="sDot"></div><span id="sLbl" style="color:var(--green)">Live</span></div>
+      <button class="btn" onclick="loadEvents()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Refresh</button>
+      <button class="btn btn-kill" onclick="killSwitch()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 5.64a9 9 0 11-12.73 0M12 2v10"/></svg>Kill</button>
+    </div>
+  </div>
+  <div id="sidebar">
+    <div class="sb-g"><div class="sb-l">Monitor</div>
+      <div class="sb-i on"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Live Feed<span class="sb-b sb-b-b" id="xN">0</span></div>
+      <div class="sb-i"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidents<span class="sb-b sb-b-r" id="xC">0</span></div>
+      <div class="sb-i"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Agents</div>
+      <div class="sb-i"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Traces</div>
+    </div>
+    <div class="sb-g"><div class="sb-l">Analyze</div>
+      <div class="sb-i"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</div>
+      <div class="sb-i"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Playbooks</div>
+    </div>
+    <div class="sb-sp"></div><div class="sb-div"></div>
+    <div class="sb-g"><div class="sb-l">Protection</div>
+      <div class="sb-seg">
+        <button class="sb-seg-b on" id="mM" onclick="setMode('monitor')">Monitor</button>
+        <button class="sb-seg-b" id="mA" onclick="setMode('alert')">Alert</button>
+        <button class="sb-seg-b" id="mP" onclick="setMode('protect')">Protect</button>
+      </div>
+    </div>
+    <div class="sb-g" style="margin-bottom:6px">
+      <div class="sb-i" style="color:var(--text-4)"><svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</div>
+    </div>
+  </div>
+  <div id="main">
+    <div class="stats">
+      <div class="sc sc-b"><div class="sc-label">Events</div><div class="sc-val" id="vE">0</div><div class="sc-sub">total captured</div></div>
+      <div class="sc sc-r"><div class="sc-label">Critical</div><div class="sc-val" id="vC" style="color:var(--green)">0</div><div class="sc-sub">active threats</div></div>
+      <div class="sc sc-a"><div class="sc-label">Warnings</div><div class="sc-val" id="vW" style="color:var(--green)">0</div><div class="sc-sub">anomalies</div></div>
+      <div class="sc sc-p"><div class="sc-label">Risk Score</div><div class="sc-val" id="vR" style="color:var(--blue)">0.00</div><div class="sc-sub">average</div></div>
+    </div>
+    <div class="al al-c" id="aC"><div class="dot dot-r dot-b" style="width:5px;height:5px"></div><div class="al-t" id="aCT"></div></div>
+    <div class="al al-p" id="aP"><div class="al-t" id="aPT"></div></div>
+    <div class="fh"><span class="fh-t">Live Event Stream</span><span class="fh-c" id="fC">0 events</span></div>
+    <div class="fd" id="fd">
+      <div class="empty" id="emp">
+        <div class="empty-bg"></div>
+        <div class="empty-core"><div class="empty-ring"></div><div class="empty-spin"></div><div class="empty-r2"></div><div class="empty-s2"></div><div class="empty-dot"></div></div>
+        <div class="empty-t">Armed and monitoring</div>
+        <div class="empty-s">ClawGuard is watching for agent activity.<br>Start the OpenClaw gateway to see live events.</div>
+      </div>
+    </div>
+  </div>
+  <div id="detail">
+    <div class="dh"><div class="dh-n">Agent Overview</div><div class="dh-s" id="dS">No events captured yet</div></div>
+    <div class="ds"><div class="ds-t">Status</div><div id="dP"><span class="dp dp-g"><span class="dot dot-g dot-b" style="width:5px;height:5px"></span>Healthy</span></div></div>
+    <div class="ds"><div class="ds-t">Metrics</div>
+      <div class="dr"><span class="dr-l">Total Events</span><span class="dr-v" id="dE">0</span></div>
+      <div class="dr"><span class="dr-l">Critical Alerts</span><span class="dr-v" id="dC">0</span></div>
+      <div class="dr"><span class="dr-l">Avg Risk Score</span><span class="dr-v" id="dR">0.00</span></div>
+      <div class="dr"><span class="dr-l">Protection Mode</span><span class="dr-v" id="dM">Monitor</span></div>
+    </div>
+    <div class="ds"><div class="ds-t">Recent Trace</div><div id="dT"></div></div>
+    <div class="ds" style="border-bottom:none"><div class="ds-t">Actions</div>
+      <div class="da">
+        <button class="da-b" onclick="loadEvents()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Refresh Events</button>
+        <button class="da-b"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>Reset Baseline</button>
+        <button class="da-b da-k" onclick="killSwitch()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 5.64a9 9 0 11-12.73 0M12 2v10"/></svg>Kill Agent</button>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
-const ICONS={gateway:"🚀",message:"📥",command:"🔧",alert:"🚨",auto_protect:"🛡",tool_call:"🔧",data_read:"📄",cred_access:"🔑",net_call:"🌐",skill_load:"📦",memory_write:"💾",error:"❌"};
-let events=[];
-let currentMode="monitor";
-async function invoke(cmd,args){try{return await window.__TAURI_INTERNALS__.invoke(cmd,args)}catch(e){console.log(cmd,e);return null}}
-async function loadEvents(){
-  const data=await invoke("load_events");
-  if(data&&data.length>0){events=data;render()}
-  if(currentMode==="protect"){
-    const result=await invoke("check_and_protect");
-    if(result&&result.action==="killed"){
-      document.getElementById("killedBanner").classList.add("show");
-      document.getElementById("killedBanner").textContent="⚡ AUTO-PROTECT: "+result.reason+" — Agent stopped at "+new Date().toLocaleTimeString();
-      document.getElementById("s-status").textContent="● KILLED";
-      document.getElementById("s-status").style.color="#ef4444";
-      setTimeout(loadEvents,1000);
-    }
-  }
-}
-function setMode(mode){
-  currentMode=mode;
-  document.querySelectorAll(".mode-btn").forEach(b=>{b.className="mode-btn"});
-  const btn=document.getElementById("mode-"+mode);
-  const dot=document.getElementById("protectDot");
-  const label=document.getElementById("protectLabel");
-  if(mode==="monitor"){
-    btn.className="mode-btn active";
-    dot.style.background="#555";dot.classList.remove("pulse");
-    label.textContent="Monitor mode — logging only";label.style.color="#555";
-    invoke("set_auto_protect",{enabled:false});
-  }else if(mode==="alert"){
-    btn.className="mode-btn active-warn";
-    dot.style.background="#fbbf24";dot.classList.add("pulse");
-    label.textContent="Alert mode — manual kill switch ready";label.style.color="#fbbf24";
-    invoke("set_auto_protect",{enabled:false});
-  }else if(mode==="protect"){
-    btn.className="mode-btn active-danger";
-    dot.style.background="#ef4444";dot.classList.add("pulse");
-    label.textContent="Auto-protect ACTIVE — threats will be neutralized automatically";label.style.color="#ef4444";
-    invoke("set_auto_protect",{enabled:true});
-  }
-}
-function render(){
-  const feed=document.getElementById("feed");
-  const criticals=events.filter(e=>e.risk>=4).length;
-  const warnings=events.filter(e=>e.risk>=2&&e.risk<4).length;
-  const avg=events.length?events.reduce((a,b)=>a+b.risk,0)/events.length:0;
-  document.getElementById("s-events").textContent=events.length;
-  document.getElementById("s-critical").textContent=criticals;
-  document.getElementById("s-critical").style.color=criticals>0?"#ef4444":"#2dd4bf";
-  document.getElementById("s-warnings").textContent=warnings;
-  document.getElementById("s-warnings").style.color=warnings>0?"#fbbf24":"#2dd4bf";
-  document.getElementById("s-avgrisk").textContent=avg.toFixed(2);
-  if(!document.getElementById("s-status").textContent.includes("KILLED")){
-    document.getElementById("s-status").textContent="● LIVE";
-    document.getElementById("s-status").style.color="#2dd4bf";
-  }
-  document.getElementById("eventCount").textContent=events.length+" events";
-  if(criticals>0){
-    document.getElementById("alertBanner").classList.add("show");
-    document.getElementById("alertBanner").textContent="🚨 "+criticals+" CRITICAL ALERT(S) — "+events.filter(e=>e.risk>=4).slice(-1)[0]?.detail;
-  }
-  let html="";
-  [...events].reverse().forEach(e=>{
-    const icon=ICONS[e.type]||"•";
-    const ts=e.timestamp?.split("T")[1]?.slice(0,12)||"";
-    const r=Math.min(e.risk||0,5);
-    html+=`<div class="event r${r}"><span class="event-icon">${icon}</span><span class="event-ts">${ts}</span><span class="event-type">${e.type}:${e.action}</span><span class="event-detail">${e.detail||""}</span><span class="risk-badge">${r}</span></div>`;
-  });
-  feed.innerHTML=html;
-}
-function killSwitch(){
-  if(confirm("⚡ KILL SWITCH: This will stop the OpenClaw gateway. Continue?")){
-    invoke("kill_agent");
-    document.getElementById("s-status").textContent="● KILLED";
-    document.getElementById("s-status").style.color="#ef4444";
-  }
-}
-setInterval(loadEvents,2000);
-loadEvents();
+const I={gateway:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16"/></svg>',message:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',command:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',alert:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',auto_protect:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',error:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'};
+let ev=[],md='monitor';
+async function inv(c,a){try{return await window.__TAURI_INTERNALS__.invoke(c,a)}catch{return null}}
+async function loadEvents(){const d=await inv('load_events');if(d&&d.length>0){ev=d;render()}if(md==='protect'){const r=await inv('check_and_protect');if(r&&r.action==='killed'){document.getElementById('aP').classList.add('show');document.getElementById('aPT').textContent='\u26A1 AUTO-PROTECT: '+r.reason+' \u2014 Agent stopped at '+new Date().toLocaleTimeString();document.getElementById('sDot').className='dot dot-r';document.getElementById('sLbl').textContent='Killed';document.getElementById('sLbl').style.color='var(--red)';setTimeout(loadEvents,1e3)}}}
+function rc(r){return r>=4?5:r>=2?3:0}
+function render(){const cr=ev.filter(e=>e.risk>=4).length,wr=ev.filter(e=>e.risk>=2&&e.risk<4).length,av=ev.length?ev.reduce((a,b)=>a+b.risk,0)/ev.length:0;document.getElementById('vE').textContent=ev.length;document.getElementById('vC').textContent=cr;document.getElementById('vC').style.color=cr>0?'var(--red)':'var(--green)';document.getElementById('vW').textContent=wr;document.getElementById('vW').style.color=wr>0?'var(--amber)':'var(--green)';document.getElementById('vR').textContent=av.toFixed(2);document.getElementById('vR').style.color=av>3?'var(--red)':av>1?'var(--amber)':'var(--blue)';document.getElementById('fC').textContent=ev.length+' events';document.getElementById('xN').textContent=ev.length;document.getElementById('xC').textContent=cr;document.getElementById('dE').textContent=ev.length;document.getElementById('dC').textContent=cr;document.getElementById('dC').style.color=cr>0?'var(--red)':'var(--text-05)';document.getElementById('dR').textContent=av.toFixed(2);document.getElementById('dM').textContent=md.charAt(0).toUpperCase()+md.slice(1);document.getElementById('dS').textContent=ev.length+' events captured';const st=cr>0?'r':'g';document.getElementById('dP').innerHTML='<span class="dp dp-'+st+'"><span class="dot dot-'+st+(st==='g'?' dot-b':'')+'" style="width:5px;height:5px"></span>'+(cr>0?'Threats Detected':'Healthy')+'</span>';if(cr>0){document.getElementById('aC').classList.add('show');document.getElementById('aCT').textContent=cr+' critical alert'+(cr>1?'s':'')+' \u2014 '+(ev.filter(e=>e.risk>=4).slice(-1)[0]?.detail||'')}const rec=[...ev].reverse().slice(0,5);document.getElementById('dT').innerHTML=rec.map((e,i)=>{const c=rc(e.risk),ts=e.timestamp?.split('T')[1]?.slice(0,8)||'',col=c===5?'var(--red)':c===3?'var(--amber)':'var(--text-2)';return'<div class="dtl-i"><div class="dtl-tr"><div class="dtl-d dtl-d'+c+'"></div>'+(i<rec.length-1?'<div class="dtl-ln dtl-ln'+c+'"></div>':'')+'</div><div class="dtl-b"><div class="dtl-n" style="color:'+col+'">'+e.type+':'+e.action+'</div><div class="dtl-dt">'+(e.detail||'')+'</div><div class="dtl-ts">'+ts+'</div></div></div>'}).join('');const f=document.getElementById('fd');document.getElementById('emp')?.remove();f.innerHTML=[...ev].reverse().map(e=>{const c=rc(e.risk),ic=I[e.type]||I.command,ts=e.timestamp?.split('T')[1]?.slice(0,12)||'',x=c===5?'c':c===3?'w':'s';return'<div class="ev"><div class="ei ei-'+x+'">'+ic+'</div><div class="et">'+ts+'</div><div class="eb"><div class="en en-'+x+'">'+e.type+':'+e.action+'</div><div class="ed">'+(e.detail||'')+'</div></div><div class="er er'+e.risk+'">'+e.risk+'</div></div>'}).join('')}
+function setMode(m){md=m;document.querySelectorAll('.sb-seg-b').forEach(b=>b.className='sb-seg-b');if(m==='monitor')document.getElementById('mM').className='sb-seg-b on';else if(m==='alert')document.getElementById('mA').className='sb-seg-b on';else{document.getElementById('mP').className='sb-seg-b on on-r';inv('set_auto_protect',{enabled:true})}if(m!=='protect')inv('set_auto_protect',{enabled:false});document.getElementById('dM').textContent=m.charAt(0).toUpperCase()+m.slice(1)}
+function killSwitch(){if(confirm('Kill the OpenClaw gateway?')){inv('kill_agent');document.getElementById('sDot').className='dot dot-r';document.getElementById('sLbl').textContent='Killed';document.getElementById('sLbl').style.color='var(--red)'}}
+setInterval(loadEvents,2000);loadEvents();
 </script>
 </body>
 </html>
